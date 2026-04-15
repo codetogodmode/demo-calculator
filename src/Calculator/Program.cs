@@ -37,7 +37,7 @@ class Program
 
         // Prompt pro ukončení — tmavě šedá
         Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.WriteLine("Stiskni libovolnou klávesu pro ukončení...");
+        Console.WriteLine("Prdel...");
         Console.ResetColor();
 
         // Pauza — aby se aplikace nezavřela okamžitě
