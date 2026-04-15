@@ -4,43 +4,20 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Prázdný řádek nahoře
+        string textoveCislo;
+        float prvniCislo = 5;
+        float druheCislo = 50;
+        float vysledek = 100;
+
+        Console.WriteLine("Řekni mi první číslo a Enter");
+        textoveCislo = Console.ReadLine();
+        prvniCislo = float.Parse(textoveCislo);
+        Console.WriteLine("Řekni mi druhé číslo a Enter");
+        textoveCislo = Console.ReadLine();
+        druheCislo = float.Parse(textoveCislo);
+        vysledek = prvniCislo + druheCislo;
+        Console.WriteLine($"První číslo: {prvniCislo} | Druhé číslo: {druheCislo} | Výsledek součtu: {vysledek}");
         Console.WriteLine();
-
-        // Horní oddělovač — tyrkysová
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        Console.WriteLine();
-
-        // Hlavní titulek — žlutá
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine("          MARTIN'S CALCULATOR");
-
-        // Podtitul — zelená
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("             CTGM Academy");
-
-        // Verze — tmavě šedá
-        Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.WriteLine("                 v1.0");
-        Console.WriteLine();
-
-        // Dolní oddělovač — tyrkysová
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine();
-        Console.WriteLine("2 + 2 = 4 ");
-        Console.WriteLine();
-        Console.ResetColor();
-
-        // Prompt pro ukončení — tmavě šedá
-        Console.ForegroundColor = ConsoleColor.DarkGray;
-        Console.WriteLine("Prdel...");
-        Console.ResetColor();
-
-        // Pauza — aby se aplikace nezavřela okamžitě
         Console.ReadKey();
     }
 }
