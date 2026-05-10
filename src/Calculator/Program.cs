@@ -6,7 +6,8 @@ enum Operation
     Substract, //1
     Multiply, //2
     Divide, //3
-    Invalid //4
+    DisplayHistory, //4
+    Invalid //5
 }
 
 class Program
@@ -17,6 +18,7 @@ class Program
         bool running = true;
         string textInput;
         Operation choice;
+        List<string> history = new List<string>();
 
         float firstNumber;
         float secondNumber;
@@ -32,6 +34,11 @@ class Program
             {
                 continue;
             }
+            else if (choice == Operation.DisplayHistory)
+            {
+                DisplayHistory(history);
+                continue;
+            }
 
             firstNumber = GetNumber("první");
             secondNumber = GetNumber("druhé");
@@ -43,7 +50,25 @@ class Program
 
             Console.WriteLine($"Výsledek: {result}");
 
+            SaveToHistory(history, firstNumber, secondNumber, choice, result);
+
             running = ContinueApplication();
+        }
+    }
+
+    static List<string> SaveToHistory(List<string> history, float firstNumber, float secondNumber, Operation usedOperation, float result)
+    {
+        string record = $"První číslo: {firstNumber} | Druhé číslo: {secondNumber} | Operace: {usedOperation} | Výsledek: {result}";
+        history.Add(record);
+        return history;
+    }
+
+    static void DisplayHistory(List<string> history)
+    {
+        Console.WriteLine($"V historii je aktuálně {history.Count()} záznamů");
+        foreach (string record in history)
+        {
+            Console.WriteLine(record);
         }
     }
 
@@ -139,7 +164,7 @@ class Program
     static bool IsOperationInputValid(int operationNumberToCheck)
     {
         //Kontrola vstupu
-        if (operationNumberToCheck < 1 || operationNumberToCheck > 4)
+        if (operationNumberToCheck < 1 || operationNumberToCheck > 5)
         {
             Console.WriteLine("Napsal jsi špatné číslo");
             return false;
@@ -155,6 +180,7 @@ class Program
         Console.WriteLine("Odečítání - 2");
         Console.WriteLine("Násobení - 3");
         Console.WriteLine("Dělení - 4");
+        Console.WriteLine("Zobrazit historii - 5");
     }
 
     static float GetNumber(string numberOrder)
