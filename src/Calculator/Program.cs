@@ -1,13 +1,23 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace Calculator;
 
 enum Operation
 {
-    Add, //0
-    Substract, //1
-    Multiply, //2
-    Divide, //3
-    DisplayHistory, //4
-    Invalid //5
+    Add,
+    Substract,
+    Multiply,
+    Divide,
+    Invalid
+}
+
+enum UserChoice
+{
+    Calculate,
+    DisplayHistory,
+    EndApplication,
+    Invalid
+
 }
 
 class Program
@@ -15,10 +25,12 @@ class Program
     static void Main(string[] args)
     {
         //Deklarace proměnných
-        bool running = true;
         string textInput;
-        Operation choice;
+        UserChoice choice;
         List<string> history = new List<string>();
+        Dictionary<string, Operation> operationsBySymbol = GetOperationsBySymbolsDictionary();
+        string[] expression;
+        Operation selectedOperation;
 
         float firstNumber;
         float secondNumber;
@@ -26,34 +38,71 @@ class Program
 
         WelcomeScreen();
 
-        while (running)
+        while (true)
         {
             choice = Menu();
 
-            if (choice == Operation.Invalid)
+            if (choice == UserChoice.Calculate)
             {
-                continue;
+
+                expression = GetExpression();
+                if (!operationsBySymbol.ContainsKey(expression[1]))
+                {
+                    Console.WriteLine("Zadal jsi nevalidní symbol");
+                    continue;
+                }
+                selectedOperation = operationsBySymbol[expression[1]];
+                try
+                {
+                    firstNumber = float.Parse(expression[0]);
+                    secondNumber = float.Parse(expression[2]);
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Chyba: to není číslo, zkus to znovu");
+                    continue;
+                }
+                catch
+                {
+                    Console.WriteLine("Něco se nepovedlo");
+                    continue;
+                }
+                Console.WriteLine($"Vybral sis operaci {selectedOperation} | První číslo: {firstNumber} | Druhé číslo: {secondNumber}");
+                result = Calculate(selectedOperation, firstNumber, secondNumber);
+                Console.WriteLine($"Výsledek: {result}");
+                SaveToHistory(history, firstNumber, secondNumber, selectedOperation, result);
             }
-            else if (choice == Operation.DisplayHistory)
+            else if (choice == UserChoice.DisplayHistory)
             {
                 DisplayHistory(history);
                 continue;
             }
-
-            firstNumber = GetNumber("první");
-            secondNumber = GetNumber("druhé");
-
-            //Výpis operace
-            Console.WriteLine($"Vybral sis operaci {choice} | První číslo: {firstNumber} | Druhé číslo: {secondNumber}");
-
-            result = Calculate(choice, firstNumber, secondNumber);
-
-            Console.WriteLine($"Výsledek: {result}");
-
-            SaveToHistory(history, firstNumber, secondNumber, choice, result);
-
-            running = ContinueApplication();
+            else if (choice == UserChoice.EndApplication)
+            {
+                break;
+            }
+            else
+            {
+                continue;
+            }
         }
+    }
+
+    static string[] GetExpression()
+    {
+        Console.WriteLine("Napiš příklad");
+        string input = Console.ReadLine();
+        return input.Split(" ");
+    }
+
+    static Dictionary<string, Operation> GetOperationsBySymbolsDictionary()
+    {
+        Dictionary<string, Operation> operationsBySymbol = new Dictionary<string, Operation>();
+        operationsBySymbol.Add("+", Operation.Add);
+        operationsBySymbol.Add("-", Operation.Substract);
+        operationsBySymbol.Add("*", Operation.Multiply);
+        operationsBySymbol.Add("/", Operation.Divide);
+        return operationsBySymbol;
     }
 
     static List<string> SaveToHistory(List<string> history, float firstNumber, float secondNumber, Operation usedOperation, float result)
@@ -72,24 +121,33 @@ class Program
         }
     }
 
-    static Operation Menu()
+    static UserChoice Menu()
     {
         string textInput;
         int choiceNumber;
-        Operation choice;
+        UserChoice choice;
         bool isValidInput;
 
         DisplayMenuOptions();
         //Vyčtení vybrané operace
         textInput = Console.ReadLine();
-        choiceNumber = int.Parse(textInput);
-
-        isValidInput = IsOperationInputValid(choiceNumber);
-        if (!isValidInput)
+        try
         {
-            return Operation.Invalid;
+            choiceNumber = int.Parse(textInput);
+
+            isValidInput = IsUserChoiceInputValid(choiceNumber);
+            if (!isValidInput)
+            {
+                return UserChoice.Invalid;
+            }
+            choice = (UserChoice)(choiceNumber - 1);
         }
-        choice = (Operation)(choiceNumber - 1);
+        catch
+        {
+            Console.WriteLine("Nezadal jsi číšlo");
+            choice = UserChoice.Invalid;
+        }
+        
         return choice;
     }
 
@@ -146,25 +204,10 @@ class Program
         }
     }
 
-    static bool ContinueApplication()
-    {
-        string textInput;
-        Console.WriteLine("Chceš další výpočet? (y)");
-        textInput = Console.ReadLine();
-        textInput = textInput.ToLower();
-        Console.WriteLine();
-        if (textInput == "y")
-        {
-            Console.WriteLine($"Uživatel zadal {textInput}, Kalkulačka ukončena");
-            return true;
-        }
-        return false;
-    }
-
-    static bool IsOperationInputValid(int operationNumberToCheck)
+    static bool IsUserChoiceInputValid(int operationNumberToCheck)
     {
         //Kontrola vstupu
-        if (operationNumberToCheck < 1 || operationNumberToCheck > 5)
+        if (operationNumberToCheck < 1 || operationNumberToCheck > 3)
         {
             Console.WriteLine("Napsal jsi špatné číslo");
             return false;
@@ -176,21 +219,9 @@ class Program
     {
         //Výpis menu
         Console.WriteLine("Vyber si operaci a dej enter");
-        Console.WriteLine("Sčítání - 1");
-        Console.WriteLine("Odečítání - 2");
-        Console.WriteLine("Násobení - 3");
-        Console.WriteLine("Dělení - 4");
-        Console.WriteLine("Zobrazit historii - 5");
-    }
-
-    static float GetNumber(string numberOrder)
-    {
-        string textInput;
-        float parsedNumber;
-        Console.WriteLine($"Napiš {numberOrder} číslo a dej enter");
-        textInput = Console.ReadLine();
-        parsedNumber = float.Parse(textInput);
-        return parsedNumber;
+        Console.WriteLine("Počítat - 1");
+        Console.WriteLine("Zobrazit historii - 2");
+        Console.WriteLine("Ukončit aplikaci - 3");
     }
 
     static void WelcomeScreen()
